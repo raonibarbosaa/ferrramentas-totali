@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Passivo Trabalhista — Totali Contabilidade</title>
+<meta name="description" content="Descubra o real custo de manter um funcionário sem carteira assinada. Calculadora gratuita do passivo trabalhista oculto na sua empresa.">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Quanto custa um funcionário informal? — Totali">
+<meta property="og:description" content="Calcule em 1 minuto o passivo trabalhista oculto do seu negócio. Gratuito.">
+<meta property="og:type" content="website">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  body{font-family:'DM Sans',system-ui,sans-serif;background:#EEF0F5;color:#1A2035;min-height:100vh;margin:0;-webkit-font-smoothing:antialiased}
+  .font-display{font-family:'Playfair Display',Georgia,serif}
+
+  /* ─── Brand tokens ───────────────────────────────────────── */
+  :root{
+    --navy:#0D1F3C;
+    --navy-deep:#091529;
+    --navy-soft:#19305A;
+    --gold:#C8963E;
+    --gold-light:#E8B963;
+    --gold-bg:rgba(200,150,62,.12);
+    --paper:#EEF0F5;
+    --white:#FFFFFF;
+    --text:#1A2035;
+    --muted:#4B5563;
+    --line:#E5E7EB;
+    --danger:#C03A2B;
+    --danger-bg:#FDF2F1;
+  }
+
+  /* ─── Inputs ─────────────────────────────────────────────── */
+  .fi{width:100%;padding:.75rem .9rem;border:1.5px solid #D1D5DB;border-radius:.5rem;font-size:1rem;background:white;color:var(--text);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;font-family:inherit}
+  .fi:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,150,62,.12)}
+  .fi-label{display:block;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:.4rem}
+  .fi-help{font-size:.75rem;color:#6B7280;margin-top:.3rem}
+  .fi-prefix{position:relative}
+  .fi-prefix .fi{padding-left:2.5rem}
+  .fi-prefix .pfx{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);font-weight:600;color:#6B7280;font-size:.9rem;pointer-events:none}
+  .fi-suffix{position:relative}
+  .fi-suffix .fi{padding-right:3.5rem}
+  .fi-suffix .sfx{position:absolute;right:.9rem;top:50%;transform:translateY(-50%);font-weight:500;color:#6B7280;font-size:.85rem;pointer-events:none}
+
+  /* ─── Buttons ────────────────────────────────────────────── */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:none;border-radius:.5rem;font-weight:600;font-size:.95rem;cursor:pointer;transition:all .18s;font-family:inherit;letter-spacing:.01em}
+  .btn:active{transform:scale(.97)}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .btn-gold{background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 100%);color:white;padding:1rem 2rem;font-size:1rem;box-shadow:0 6px 20px rgba(200,150,62,.32)}
+  .btn-gold:hover:not(:disabled){opacity:.94;transform:translateY(-1px);box-shadow:0 8px 24px rgba(200,150,62,.4)}
+  .btn-navy{background:var(--navy);color:white;padding:.9rem 1.8rem}
+  .btn-navy:hover:not(:disabled){background:var(--navy-soft)}
+  .btn-wa{background:#25D366;color:white;padding:1rem 2rem;font-size:1rem;box-shadow:0 6px 20px rgba(37,211,102,.32)}
+  .btn-wa:hover{background:#1FB855;transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:white;padding:.55rem 1.1rem;border:1.5px solid rgba(255,255,255,.25)}
+  .btn-ghost:hover{border-color:rgba(255,255,255,.6)}
+
+  /* ─── Header ─────────────────────────────────────────────── */
+  .site-header{background:var(--navy);color:white;padding:1rem 0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .brand{display:inline-flex;align-items:center;gap:.75rem}
+  .brand-logo{background:white;padding:.4rem .75rem;border-radius:.5rem;display:inline-flex;align-items:center;height:2.4rem}
+  .brand-logo img{height:1.6rem;width:auto;display:block}
+  .brand-divider{width:1px;height:1.5rem;background:rgba(255,255,255,.18)}
+  .brand-product{font-family:'Playfair Display',serif;font-weight:600;font-size:1.1rem;color:white;letter-spacing:.01em}
+
+  /* ─── Container ──────────────────────────────────────────── */
+  .container-x{max-width:1100px;margin:0 auto;padding:0 1.25rem}
+  .container-sm{max-width:680px;margin:0 auto;padding:0 1.25rem}
+
+  /* ─── Hero ───────────────────────────────────────────────── */
+  .hero{
+    padding:3.5rem 0 2.5rem;
+    background:
+      radial-gradient(circle at 85% 15%, rgba(200,150,62,.08) 0%, transparent 50%),
+      linear-gradient(180deg,#EEF0F5 0%,#FFFFFF 100%);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    top:-100px;right:-100px;
+    width:400px;height:400px;
+    background:radial-gradient(circle, rgba(200,150,62,.05) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--gold-bg);color:#8B6718;padding:.4rem .95rem;border-radius:9999px;font-size:.78rem;font-weight:600;margin-bottom:1.5rem;letter-spacing:.02em}
+  .hero-badge::before{content:"";width:.45rem;height:.45rem;background:var(--gold);border-radius:50%;box-shadow:0 0 0 3px rgba(200,150,62,.2)}
+  .hero h1{font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(2rem,5.5vw,3.4rem);line-height:1.08;color:var(--navy);margin-bottom:1.25rem;letter-spacing:-.015em}
+  .hero h1 em{font-style:italic;color:var(--gold)}
+  .hero .lead{font-size:1.08rem;color:var(--muted);line-height:1.65;max-width:42rem;margin:0 auto 1.5rem}
+  .hero-meta{display:inline-flex;align-items:center;gap:1.25rem;color:#6B7280;font-size:.82rem;font-weight:500}
+  .hero-meta-item{display:inline-flex;align-items:center;gap:.4rem}
+  .hero-meta svg{color:var(--gold)}
+
+  /* ─── Card / Form ────────────────────────────────────────── */
+  .form-card{
+    background:white;
+    border-radius:1.1rem;
+    padding:2rem;
+    box-shadow:0 12px 36px rgba(13,31,60,.08), 0 1px 2px rgba(13,31,60,.04);
+    border:1px solid rgba(13,31,60,.04);
+    position:relative;
+  }
+  @media(min-width:640px){ .form-card{padding:2.5rem} }
+  .form-card::before{
+    content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:60%;height:3px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    border-radius:9999px;
+  }
+
+  .form-section-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--navy);margin:0 0 .25rem;text-align:center}
+  .form-section-sub{color:var(--muted);text-align:center;font-size:.92rem;margin:0 0 1.75rem}
+
+  /* ─── Result block ───────────────────────────────────────── */
+  .result-section{padding:3rem 0 4rem;display:none}
+  .result-section.show{display:block;animation:fadeUp .55s cubic-bezier(.16,1,.3,1)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+  .result-headline{text-align:center;margin-bottom:2rem}
+  .result-headline .kicker{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding:.35rem .8rem;border:1px solid rgba(200,150,62,.3);border-radius:9999px;margin-bottom:1.1rem}
+  .result-headline h2{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,4vw,2.2rem);color:var(--navy);margin:0 0 .5rem;font-weight:700;line-height:1.2}
+  .result-headline p{color:var(--muted);margin:0;font-size:1rem;max-width:38rem;margin-left:auto;margin-right:auto}
+
+  .number-display{
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color:white;border-radius:1.1rem;
+    padding:2.5rem 2rem;
+    text-align:center;
+    margin:0 auto 2rem;
+    max-width:560px;
+    box-shadow:0 16px 40px rgba(13,31,60,.18);
+    position:relative;
+    overflow:hidden;
+  }
+  .number-display::before{
+    content:"";position:absolute;
+    top:-50%;right:-30%;
+    width:300px;height:300px;
+    background:radial-gradient(circle, rgba(200,150,62,.18) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  .number-display .label{font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-light);margin-bottom:.6rem;position:relative}
+  .number-display .value{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,7vw,3.6rem);font-weight:700;line-height:1;letter-spacing:-.02em;position:relative}
+  .number-display .value sup{font-size:.4em;font-weight:600;color:var(--gold-light);vertical-align:top;margin-right:.15em}
+  .number-display .sub{font-size:.88rem;color:rgba(255,255,255,.7);margin-top:.7rem;position:relative}
+
+  /* ─── Breakdown table ────────────────────────────────────── */
+  .breakdown{
+    background:white;border-radius:.875rem;
+    border:1px solid var(--line);
+    overflow:hidden;
+    margin:0 auto 2rem;
+    max-width:680px;
+    box-shadow:0 4px 18px rgba(13,31,60,.06);
+  }
+  .breakdown-head{
+    background:#F9FAFB;border-bottom:1px solid var(--line);
+    padding:1rem 1.5rem;display:flex;align-items:center;gap:.6rem;
+  }
+  .breakdown-head h3{margin:0;font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);font-weight:700}
+  .breakdown-row{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.85rem 1.5rem;border-bottom:1px solid var(--line)}
+  .breakdown-row:last-child{border-bottom:none}
+  .breakdown-row .lbl{color:var(--text);font-size:.92rem}
+  .breakdown-row .lbl .desc{display:block;color:#6B7280;font-size:.78rem;margin-top:.15rem}
+  .breakdown-row .val{font-variant-numeric:tabular-nums;font-weight:600;color:var(--navy);font-size:.95rem;white-space:nowrap}
+  .breakdown-total{background:var(--navy);color:white;padding:1.1rem 1.5rem;display:flex;justify-content:space-between;align-items:center}
+  .breakdown-total .lbl{font-weight:600;font-size:.95rem}
+  .breakdown-total .val{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--gold-light);font-variant-numeric:tabular-nums}
+
+  /* Locked / teaser */
+  .breakdown.locked .breakdown-row .val,
+  .breakdown.locked .breakdown-total .val{
+    filter:blur(7px);
+    user-select:none;
+    pointer-events:none;
+  }
+  .breakdown.locked{position:relative}
+
+  /* ─── Email gate ─────────────────────────────────────────── */
+  .gate{
+    background:white;
+    border:1.5px dashed var(--gold);
+    border-radius:1rem;
+    padding:1.75rem 1.5rem;
+    max-width:560px;
+    margin:0 auto 2rem;
+    text-align:center;
+  }
+  .gate h3{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--navy);margin:0 0 .5rem;font-weight:700}
+  .gate p{color:var(--muted);font-size:.92rem;margin:0 0 1.25rem;line-height:1.55}
+  .gate-form{display:flex;flex-direction:column;gap:.7rem;max-width:380px;margin:0 auto}
+  .gate-trust{margin-top:1rem;font-size:.75rem;color:#6B7280}
+  .gate-trust svg{display:inline;vertical-align:-2px;margin-right:.25rem;color:var(--gold)}
+
+  /* ─── Comparativo CLT vs Informal ────────────────────────── */
+  .compare{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:1rem;
+    max-width:680px;
+    margin:0 auto 2rem;
+  }
+  @media(min-width:640px){ .compare{grid-template-columns:1fr 1fr} }
+  .compare-card{background:white;border-radius:.875rem;padding:1.5rem;border:1px solid var(--line);box-shadow:0 2px 10px rgba(13,31,60,.04)}
+  .compare-card.risk{border-color:#F4C7C0;background:linear-gradient(180deg,#FDF2F1 0%,#FFFFFF 60%)}
+  .compare-card.safe{border-color:rgba(200,150,62,.35);background:linear-gradient(180deg,rgba(200,150,62,.06) 0%,#FFFFFF 60%)}
+  .compare-tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .65rem;border-radius:9999px;margin-bottom:.75rem}
+  .compare-tag.risk{background:#FDDDD7;color:#9A2D1F}
+  .compare-tag.safe{background:rgba(200,150,62,.15);color:#8B6718}
+  .compare-card h4{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--navy);margin:0 0 .75rem}
+  .compare-card ul{list-style:none;padding:0;margin:0;font-size:.88rem;line-height:1.6;color:var(--muted)}
+  .compare-card li{padding:.25rem 0;display:flex;gap:.5rem;align-items:flex-start}
+  .compare-card li::before{content:"";flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:.5rem}
+  .compare-card.risk li::before{background:#C03A2B}
+
+  /* ─── Risk box ───────────────────────────────────────────── */
+  .risk-box{
+    background:var(--danger-bg);border:1px solid #F4C7C0;border-radius:.875rem;
+    padding:1.5rem;max-width:680px;margin:0 auto 2.5rem;
+  }
+  .risk-box h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:#9A2D1F;margin:0 0 .65rem;display:flex;align-items:center;gap:.5rem;font-weight:700}
+  .risk-box ul{list-style:none;padding:0;margin:.5rem 0 0;font-size:.88rem;line-height:1.65;color:#7A2418}
+  .risk-box li{padding:.15rem 0;padding-left:1.2rem;position:relative}
+  .risk-box li::before{content:"›";position:absolute;left:.25rem;font-weight:700}
+
+  /* ─── CTA section ────────────────────────────────────────── */
+  .cta-section{
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    border-radius:1.1rem;
+    padding:2.5rem 1.75rem;
+    text-align:center;
+    max-width:680px;margin:0 auto;
+    color:white;
+    position:relative;overflow:hidden;
+    box-shadow:0 16px 40px rgba(13,31,60,.18);
+  }
+  .cta-section::before{
+    content:"";position:absolute;
+    top:-30%;left:-10%;
+    width:50%;height:160%;
+    background:radial-gradient(circle, rgba(200,150,62,.16) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  .cta-section h3{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3.5vw,2rem);margin:0 0 .75rem;font-weight:700;line-height:1.2;position:relative}
+  .cta-section h3 em{font-style:italic;color:var(--gold-light)}
+  .cta-section p{color:rgba(255,255,255,.78);font-size:1rem;line-height:1.6;max-width:32rem;margin:0 auto 1.75rem;position:relative}
+  .cta-buttons{display:flex;flex-direction:column;gap:.75rem;align-items:center;position:relative}
+  @media(min-width:520px){ .cta-buttons{flex-direction:row;justify-content:center} }
+  .cta-section .small{font-size:.78rem;color:rgba(255,255,255,.6);margin-top:1.5rem;position:relative}
+
+  /* ─── Trust strip ────────────────────────────────────────── */
+  .trust-strip{padding:2.5rem 0;background:white;border-top:1px solid var(--line)}
+  .trust-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;text-align:center}
+  @media(min-width:640px){ .trust-grid{grid-template-columns:repeat(3,1fr)} }
+  .trust-item h4{font-family:'Playfair Display',serif;font-size:1rem;color:var(--navy);margin:.5rem 0 .25rem;font-weight:700}
+  .trust-item p{color:var(--muted);font-size:.85rem;margin:0;line-height:1.5}
+  .trust-icon{width:2.5rem;height:2.5rem;background:var(--gold-bg);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--gold)}
+
+  /* ─── Footer ─────────────────────────────────────────────── */
+  footer{background:var(--navy);color:rgba(255,255,255,.7);padding:1.75rem 0;text-align:center;font-size:.82rem}
+  footer a{color:var(--gold-light);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+  footer .disclaimer{font-size:.72rem;color:rgba(255,255,255,.45);max-width:42rem;margin:.75rem auto 0;line-height:1.5}
+
+  /* ─── Toast ──────────────────────────────────────────────── */
+  #toast{position:fixed;top:1rem;right:1rem;z-index:9999;pointer-events:none}
+  .toast-inner{padding:.75rem 1.25rem;border-radius:.5rem;font-size:.875rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.18);animation:toastIn .25s ease;margin-bottom:.5rem;max-width:340px}
+  .toast-success{background:#059669;color:white}
+  .toast-error{background:#DC2626;color:white}
+  .toast-info{background:var(--navy);color:white}
+  @keyframes toastIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+
+  /* ─── Spinner ────────────────────────────────────────────── */
+  .spinner{width:1.1rem;height:1.1rem;border:2px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .65s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ─── Helpers ────────────────────────────────────────────── */
+  .alert{padding:.7rem 1rem;border-radius:.5rem;font-size:.85rem;margin-bottom:1rem}
+  .alert-error{background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5}
+  [hidden]{display:none !important}
+
+  /* Smooth scroll */
+  html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="container-x flex items-center justify-between">
+    <div class="brand">
+      <a href="index.html" class="brand-logo" title="Voltar para o site Totali">
+        <img src="totali-logo.png" alt="Totali" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=&quot;font-family:Playfair Display,serif;font-weight:700;color:#0D1F3C;font-size:1.1rem&quot;>Totali</span>'">
+      </a>
+      <div class="brand-divider"></div>
+      <span class="brand-product">Passivo Trabalhista</span>
+    </div>
+    <a href="index.html" class="btn btn-ghost" style="font-size:.82rem">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Voltar
+    </a>
+  </div>
+</header>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container-sm text-center">
+    <div class="hero-badge">Diagnóstico gratuito · Totali Contabilidade</div>
+    <h1>Quanto um funcionário<br><em>sem carteira</em> custa de verdade?</h1>
+    <p class="lead">A informalidade parece econômica — até virar processo. Descubra em 1 minuto o passivo trabalhista oculto que sua empresa pode estar acumulando, calculado com base na CLT.</p>
+    <div class="hero-meta">
+      <span class="hero-meta-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4z"/></svg>
+        Cálculo conforme CLT
+      </span>
+      <span class="hero-meta-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Em menos de 1 minuto
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FORM ═══════════════════════════════════════════════ -->
+<section style="padding:1rem 0 3rem">
+  <div class="container-sm">
+    <div class="form-card" id="form-card">
+      <h2 class="form-section-title">Informe os dados do funcionário</h2>
+      <p class="form-section-sub">Apenas estimativas — sem nomes, sem CPF.</p>
+
+      <form id="calc-form" onsubmit="handleCalc(event)" autocomplete="off" novalidate>
+        <div style="margin-bottom:1.2rem">
+          <label class="fi-label" for="f-salario">Salário mensal pago <span style="color:#e54d4d">*</span></label>
+          <div class="fi-prefix">
+            <span class="pfx">R$</span>
+            <input type="text" id="f-salario" class="fi" required inputmode="decimal" placeholder="2.000,00" oninput="maskMoney(this)">
+          </div>
+          <p class="fi-help">Valor médio recebido em dinheiro/pix mensalmente.</p>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <label class="fi-label" for="f-anos">Há quanto tempo trabalha com você <span style="color:#e54d4d">*</span></label>
+          <div class="fi-suffix">
+            <input type="number" id="f-anos" class="fi" required min="0.1" max="30" step="0.1" placeholder="2.5">
+            <span class="sfx">anos</span>
+          </div>
+          <p class="fi-help">Use decimais se necessário (ex.: 1.5 = um ano e meio).</p>
+        </div>
+
+        <div style="margin-bottom:1.6rem">
+          <label class="fi-label" for="f-qtd">Quantos funcionários estão nessa situação</label>
+          <div class="fi-suffix">
+            <input type="number" id="f-qtd" class="fi" min="1" max="100" step="1" value="1">
+            <span class="sfx">pessoa(s)</span>
+          </div>
+          <p class="fi-help">O passivo é multiplicado pelo número informado.</p>
+        </div>
+
+        <button type="submit" class="btn btn-gold" id="calc-btn" style="width:100%">
+          Calcular meu passivo
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+
+        <p style="text-align:center;color:#6B7280;font-size:.75rem;margin:1rem 0 0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px;color:#C8963E"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Seus dados não são compartilhados.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RESULT ═════════════════════════════════════════════ -->
+<section class="result-section" id="result">
+  <div class="container-sm">
+
+    <!-- Headline -->
+    <div class="result-headline">
+      <span class="kicker">Sua estimativa</span>
+      <h2>Esse é o passivo trabalhista <em style="color:var(--gold);font-style:italic">oculto</em> hoje</h2>
+      <p>Valores estimados com base nas verbas e encargos exigidos pela CLT, em caso de reclamação trabalhista ou fiscalização.</p>
+    </div>
+
+    <!-- Big Number -->
+    <div class="number-display">
+      <div class="label">Passivo estimado total</div>
+      <div class="value"><sup>R$</sup><span id="r-total">0,00</span></div>
+      <div class="sub" id="r-sub">—</div>
+    </div>
+
+    <!-- Email gate (mostrado quando teaser) -->
+    <div class="gate" id="email-gate">
+      <h3>Veja de onde sai esse valor</h3>
+      <p>Receba o detalhamento completo das verbas, riscos jurídicos e a opção de regularização no seu e-mail.</p>
+
+      <div id="gate-error" class="alert alert-error" hidden></div>
+
+      <form class="gate-form" id="gate-form" onsubmit="handleEmail(event)" autocomplete="off">
+        <input type="text" id="g-nome" class="fi" required placeholder="Seu nome" autocomplete="name">
+        <input type="email" id="g-email" class="fi" required placeholder="Seu melhor e-mail" autocomplete="email">
+        <input type="tel" id="g-tel" class="fi" required placeholder="WhatsApp (com DDD)" autocomplete="tel" oninput="maskPhone(this)">
+        <button type="submit" class="btn btn-navy" id="gate-btn" style="margin-top:.3rem">
+          Ver detalhamento completo
+        </button>
+        <p class="gate-trust">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Sem spam. Apenas o resultado e contato da Totali se você quiser.
+        </p>
+      </form>
+    </div>
+
+    <!-- Breakdown (locked inicialmente) -->
+    <div class="breakdown locked" id="breakdown">
+      <div class="breakdown-head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8963E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5V19a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h7.5"/><path d="M16 3l5 5-11 11H5v-5L16 3z"/></svg>
+        <h3>Detalhamento das verbas e encargos</h3>
+      </div>
+
+      <div class="breakdown-row">
+        <div class="lbl">FGTS retroativo
+          <span class="desc">8% sobre cada salário ao longo do período</span>
+        </div>
+        <div class="val" id="r-fgts">—</div>
+      </div>
+      <div class="breakdown-row">
+        <div class="lbl">Multa de 40% do FGTS
+          <span class="desc">Sobre o saldo, em demissão sem justa causa</span>
+        </div>
+        <div class="val" id="r-multa40">—</div>
+      </div>
+      <div class="breakdown-row">
+        <div class="lbl">13º salários não pagos
+          <span class="desc">Um salário inteiro por ano de vínculo</span>
+        </div>
+        <div class="val" id="r-13">—</div>
+      </div>
+      <div class="breakdown-row">
+        <div class="lbl">Férias vencidas + 1/3
+          <span class="desc">Acumuladas em todo o período</span>
+        </div>
+        <div class="val" id="r-ferias">—</div>
+      </div>
+      <div class="breakdown-row">
+        <div class="lbl">Aviso prévio indenizado
+          <span class="desc">30 dias + 3 por ano (máx. 90 dias)</span>
+        </div>
+        <div class="val" id="r-aviso">—</div>
+      </div>
+      <div class="breakdown-row">
+        <div class="lbl">Multa do art. 477 da CLT
+          <span class="desc">Pelo atraso no pagamento das verbas</span>
+        </div>
+        <div class="val" id="r-477">—</div>
+      </div>
+      <div class="breakdown-row">
+        <div class="lbl">INSS patronal não recolhido
+          <span class="desc">20% sobre a folha em todo o período</span>
+        </div>
+        <div class="val" id="r-inss">—</div>
+      </div>
+      <div class="breakdown-row">
+        <div class="lbl">Multa administrativa MTE
+          <span class="desc">Aprox. R$ 3.000 por trabalhador sem registro</span>
+        </div>
+        <div class="val" id="r-mte">—</div>
+      </div>
+      <div class="breakdown-total">
+        <div class="lbl">Total estimado do passivo</div>
+        <div class="val" id="r-total-tbl">—</div>
+      </div>
+    </div>
+
+    <!-- Conteúdo desbloqueado (só aparece depois do email) -->
+    <div id="unlocked-content" hidden>
+
+      <!-- Comparativo -->
+      <h3 class="font-display" style="text-align:center;font-size:1.4rem;color:var(--navy);margin:2.5rem 0 1.25rem;font-weight:700">
+        Mas e se você <em style="color:var(--gold);font-style:italic">formalizar</em> o vínculo?
+      </h3>
+
+      <div class="compare">
+        <div class="compare-card risk">
+          <span class="compare-tag risk">Hoje · Informal</span>
+          <h4>O passivo cresce todo mês</h4>
+          <ul>
+            <li>Cada mês de vínculo aumenta o FGTS retroativo, 13º proporcional e férias</li>
+            <li>Risco de processo trabalhista por até 2 anos após o desligamento</li>
+            <li>Possibilidade de auto de infração e ação do MPT</li>
+            <li>Sem proteção previdenciária para o trabalhador</li>
+          </ul>
+        </div>
+        <div class="compare-card safe">
+          <span class="compare-tag safe">Formalizado · CLT</span>
+          <h4>Custo previsível, risco zero</h4>
+          <ul>
+            <li>Encargos sociais entram no custo mensal (~50% sobre o salário)</li>
+            <li>Custo estimado: <strong id="r-clt-mensal" style="color:var(--navy)">—</strong> por mês, com tudo</li>
+            <li>Sem passivo acumulando, sem surpresa em rescisão</li>
+            <li>Contratação enquadrável em <em>Simples Nacional</em> com benefícios</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Riscos -->
+      <div class="risk-box">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Riscos adicionais (não incluídos no cálculo)
+        </h3>
+        <ul>
+          <li>Indenização por danos morais — comumente entre R$ 5.000 e R$ 50.000</li>
+          <li>Horas extras, adicional noturno, insalubridade ou periculosidade (se aplicáveis)</li>
+          <li>Ação Civil Pública pelo Ministério Público do Trabalho</li>
+          <li>Bloqueio de bens da empresa e dos sócios em execução trabalhista</li>
+        </ul>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-section">
+        <h3>Regularize agora e <em>elimine o passivo</em></h3>
+        <p>A Totali Contabilidade cuida da formalização completa — admissão, registro em CTPS, eSocial, folha mensal e cálculo de encargos. Fale com a equipe sem compromisso.</p>
+        <div class="cta-buttons">
+          <a href="#" id="cta-whatsapp" class="btn btn-wa" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1c-.2.3-.8 1-1 1.2-.2.2-.4.2-.6.1-.3-.1-1.2-.5-2.3-1.5-.8-.7-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6.1-.1.3-.4.4-.5.1-.2.2-.3.3-.5 0-.2 0-.4-.1-.5-.1-.1-.6-1.5-.8-2.1-.2-.5-.5-.5-.6-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1.1 1-1.1 2.5s1.1 3 1.3 3.2c.2.2 2.2 3.4 5.4 4.7.8.3 1.4.5 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.8-.7 2.1-1.5.3-.7.3-1.4.2-1.5-.1-.2-.3-.2-.6-.4zM12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.3-1.6c1.7.9 3.7 1.5 5.7 1.5 6.6 0 12-5.4 12-12S18.6 0 12 0zm0 22c-1.8 0-3.6-.5-5.1-1.4l-.4-.2-3.7 1 1-3.7-.2-.4C2.6 15.7 2 13.9 2 12 2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10z"/></svg>
+            Falar no WhatsApp
+          </a>
+          <a href="mailto:contato@totalicontabilidade.com.br?subject=Quero%20regularizar%20meus%20funcionarios" class="btn btn-navy" style="background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Enviar e-mail
+          </a>
+        </div>
+        <p class="small">CRC-SE 007819/O-4 · Itabaiana/SE</p>
+      </div>
+
+    </div><!-- /#unlocked-content -->
+
+  </div>
+</section>
+
+<!-- ═══ TRUST STRIP ════════════════════════════════════════ -->
+<section class="trust-strip">
+  <div class="container-x">
+    <div class="trust-grid">
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4z"/></svg>
+        </div>
+        <h4>Cálculo conforme CLT</h4>
+        <p>Verbas e prazos baseados na legislação trabalhista vigente.</p>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h4>CRC-SE 007819/O-4</h4>
+        <p>Contabilidade registrada e autorizada pelo CRC-Sergipe.</p>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <h4>Dados protegidos (LGPD)</h4>
+        <p>Suas informações são usadas apenas para retorno do diagnóstico.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═════════════════════════════════════════════ -->
+<footer>
+  <div class="container-x">
+    © 2026 <strong style="color:white">Totali Contabilidade</strong> · Itabaiana/SE · <a href="mailto:contato@totalicontabilidade.com.br">contato@totalicontabilidade.com.br</a>
+    <p class="disclaimer">
+      Os valores apresentados nesta calculadora são <strong>estimativas</strong> baseadas em parâmetros gerais da CLT e têm finalidade exclusivamente informativa. O cálculo definitivo das verbas trabalhistas depende da análise individual de cada caso, com base em documentos, jornada efetiva e outras condições contratuais.
+    </p>
+  </div>
+</footer>
+
+<!-- ═══ TOAST ══════════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<!-- ═══ FIREBASE (opcional) ════════════════════════════════
+     Se o usuário já tiver firebase-config.js no mesmo diretório,
+     o lead é gravado em Firestore. Senão, captura segue
+     sem persistência (apenas abre WhatsApp/email).
+     ───────────────────────────────────────────────────────── -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  // Tenta carregar firebase-config.js (mesmo arquivo usado pelo index.html).
+  // Se falhar, segue sem Firebase.
+  (function(){
+    var s = document.createElement('script');
+    s.src = 'firebase-config.js';
+    s.onerror = function(){ console.info('firebase-config.js não encontrado — lead capture funciona apenas localmente.'); };
+    document.head.appendChild(s);
+  })();
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   CONFIG — Edite esses valores conforme a Totali
+   ═══════════════════════════════════════════════════════════ */
+const TOTALI_WHATSAPP = '5579999032756';   // (79) 99903-2756 — Totali
+const TOTALI_EMAIL    = 'contato@totalicontabilidade.com.br';
+
+/* ═══════════════════════════════════════════════════════════
+   Helpers
+   ═══════════════════════════════════════════════════════════ */
+const BRL = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+const $ = id => document.getElementById(id);
+
+function maskMoney(el){
+  let v = el.value.replace(/\D/g,'');
+  if(!v){ el.value=''; return; }
+  v = (parseInt(v,10)/100).toFixed(2);
+  v = v.replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  el.value = v;
+}
+
+function maskPhone(el){
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>10) v = v.replace(/^(\d{2})(\d{5})(\d{0,4}).*/,'($1) $2-$3');
+  else if(v.length>6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
+  else if(v.length>2) v = v.replace(/^(\d{2})(\d{0,5}).*/,'($1) $2');
+  else v = v.replace(/^(\d*)/,'($1');
+  el.value = v;
+}
+
+function parseMoney(s){
+  if(!s) return 0;
+  return parseFloat(String(s).replace(/\./g,'').replace(',','.')) || 0;
+}
+
+function toast(msg, type='info'){
+  const box = $('toast');
+  const el = document.createElement('div');
+  el.className = `toast-inner toast-${type}`;
+  el.textContent = msg;
+  box.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 3500);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CÁLCULO DO PASSIVO
+   ─────────────────────────────────────────────────────────
+   Premissas (CLT — estimativa de cenário adverso, ñ liminar)
+   - FGTS: 8% × salário × meses
+   - Multa 40% FGTS: 40% sobre o saldo acumulado
+   - 13°s não pagos: 1 salário por ano completo (proporcional dispensado p/ simplicidade)
+   - Férias + 1/3: (salário + salário/3) por ano
+   - Aviso prévio: (30 + 3 × anos), máx 90 dias
+   - Multa Art. 477 CLT: 1 salário (atraso pgto rescisão)
+   - INSS patronal: 20% × salário × meses
+   - Multa MTE: R$ 3.000 fixo (por funcionário sem registro)
+   ═══════════════════════════════════════════════════════════ */
+function calcularPassivo({salario, anos, qtd}){
+  const meses = anos * 12;
+  const anosInteiros = Math.floor(anos);
+
+  const fgts    = 0.08 * salario * meses;
+  const multa40 = 0.40 * fgts;
+  const dec13   = salario * anos;                                  // proporcional anual
+  const ferias  = (salario + salario/3) * anos;                    // férias + 1/3
+  const diasAviso = Math.min(30 + 3 * anosInteiros, 90);
+  const aviso   = (salario / 30) * diasAviso;
+  const m477    = salario;
+  const inss    = 0.20 * salario * meses;
+  const mte     = 3000;
+
+  const subtotal = fgts + multa40 + dec13 + ferias + aviso + m477 + inss + mte;
+  const total    = subtotal * qtd;
+
+  // Custo CLT mensal estimado (~50% encargos)
+  const cltMensal = salario * 1.50;
+
+  return {
+    salario, anos, qtd, meses,
+    fgts, multa40, dec13, ferias, aviso, m477, inss, mte,
+    subtotal, total, cltMensal
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════ */
+let currentCalc = null;  // último cálculo
+let unlocked = false;    // já capturou email?
+
+/* ═══════════════════════════════════════════════════════════
+   Handler: cálculo
+   ═══════════════════════════════════════════════════════════ */
+function handleCalc(e){
+  e.preventDefault();
+  const salario = parseMoney($('f-salario').value);
+  const anos = parseFloat($('f-anos').value);
+  const qtd = Math.max(1, parseInt($('f-qtd').value || '1', 10));
+
+  if(!salario || salario < 100){
+    toast('Informe o salário pago (mínimo R$ 100).', 'error');
+    $('f-salario').focus(); return;
+  }
+  if(!anos || anos < 0.1){
+    toast('Informe o tempo de trabalho (mínimo 0.1 ano).', 'error');
+    $('f-anos').focus(); return;
+  }
+
+  const btn = $('calc-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Calculando...';
+
+  // Pequeno delay para drama + UX
+  setTimeout(()=>{
+    currentCalc = calcularPassivo({salario, anos, qtd});
+    renderTeaser(currentCalc);
+    btn.disabled = false;
+    btn.innerHTML = 'Recalcular <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
+
+    // Rola para o resultado
+    setTimeout(()=>{
+      $('result').scrollIntoView({behavior:'smooth', block:'start'});
+    }, 80);
+  }, 600);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Render: teaser (número grande + breakdown blurred)
+   ═══════════════════════════════════════════════════════════ */
+function renderTeaser(c){
+  $('result').classList.add('show');
+
+  // Total grande
+  $('r-total').textContent = BRL(c.total);
+
+  // Subtítulo contextual
+  const periodo = c.anos < 1
+    ? `${Math.round(c.meses)} mês(es)`
+    : `${c.anos.toLocaleString('pt-BR')} anos`;
+  const pessoas = c.qtd > 1 ? ` × ${c.qtd} funcionários` : '';
+  $('r-sub').textContent = `Considerando ${periodo} de vínculo${pessoas}.`;
+
+  // Breakdown valores (já preenche, mas fica blurred até unlock)
+  $('r-fgts').textContent     = 'R$ ' + BRL(c.fgts * c.qtd);
+  $('r-multa40').textContent  = 'R$ ' + BRL(c.multa40 * c.qtd);
+  $('r-13').textContent       = 'R$ ' + BRL(c.dec13 * c.qtd);
+  $('r-ferias').textContent   = 'R$ ' + BRL(c.ferias * c.qtd);
+  $('r-aviso').textContent    = 'R$ ' + BRL(c.aviso * c.qtd);
+  $('r-477').textContent      = 'R$ ' + BRL(c.m477 * c.qtd);
+  $('r-inss').textContent     = 'R$ ' + BRL(c.inss * c.qtd);
+  $('r-mte').textContent      = 'R$ ' + BRL(c.mte * c.qtd);
+  $('r-total-tbl').textContent= 'R$ ' + BRL(c.total);
+  $('r-clt-mensal').textContent = 'R$ ' + BRL(c.cltMensal);
+
+  // Se já desbloqueado antes (recalcular), mantém aberto
+  if(unlocked){
+    revealDetails();
+  } else {
+    $('email-gate').hidden = false;
+    $('breakdown').classList.add('locked');
+    $('unlocked-content').hidden = true;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Handler: captura de e-mail
+   ═══════════════════════════════════════════════════════════ */
+async function handleEmail(e){
+  e.preventDefault();
+  const errBox = $('gate-error');
+  errBox.hidden = true;
+
+  const nome = $('g-nome').value.trim();
+  const email = $('g-email').value.trim().toLowerCase();
+  const tel = $('g-tel').value.trim();
+
+  if(!nome || !email || !tel){
+    errBox.textContent = 'Preencha todos os campos.';
+    errBox.hidden = false; return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errBox.textContent = 'E-mail inválido.';
+    errBox.hidden = false; return;
+  }
+
+  const btn = $('gate-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Liberando...';
+
+  // Tenta gravar no Firestore (se disponível)
+  try {
+    if(window.firebase && firebase.apps && firebase.apps.length){
+      await firebase.firestore().collection('leads_passivo').add({
+        nome, email, telefone: tel,
+        calculo: currentCalc ? {
+          salario: currentCalc.salario,
+          anos: currentCalc.anos,
+          qtd: currentCalc.qtd,
+          total: currentCalc.total
+        } : null,
+        origem: 'passivo.html',
+        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  } catch(err){
+    console.warn('Falha ao salvar lead no Firestore:', err.message);
+    // Continua mesmo sem persistir — UX prevalece
+  }
+
+  // Desbloqueia
+  unlocked = true;
+  revealDetails();
+
+  toast('Detalhamento liberado abaixo.', 'success');
+
+  // Atualiza CTA WhatsApp com mensagem pré-preenchida
+  updateWhatsAppLink(nome);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Reveal: tira blur, mostra conteúdo extra
+   ═══════════════════════════════════════════════════════════ */
+function revealDetails(){
+  $('email-gate').hidden = true;
+  $('breakdown').classList.remove('locked');
+  $('unlocked-content').hidden = false;
+
+  setTimeout(()=>{
+    $('breakdown').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 120);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WhatsApp CTA — mensagem pré-preenchida
+   ═══════════════════════════════════════════════════════════ */
+function updateWhatsAppLink(nome=''){
+  if(!currentCalc) return;
+  const saudacao = nome ? `Olá! Sou ${nome}.` : 'Olá!';
+  const msg = `${saudacao} Usei a calculadora de passivo da Totali e meu resultado foi R$ ${BRL(currentCalc.total)}. Quero conversar sobre regularização.`;
+  const link = `https://wa.me/${TOTALI_WHATSAPP}?text=${encodeURIComponent(msg)}`;
+  $('cta-whatsapp').href = link;
+}
+
+// Inicializa link WA sem mensagem por padrão
+$('cta-whatsapp').href = `https://wa.me/${TOTALI_WHATSAPP}`;
+</script>
+
+</body>
+</html>
